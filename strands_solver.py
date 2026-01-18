@@ -1,5 +1,3 @@
-from nltk.corpus import words
-
 DICT = []
 
 with open('words.txt', 'r') as file:
@@ -12,18 +10,18 @@ class path():
     def __init__(self, coord_list, field):
         self.coord_list = coord_list
         self.field = field
-        word_pointer_start = None
-        word_pointer_end = None      
+        if len(coord_list) == 1:
+            self.word_pointer_start = None
+            self.word_pointer_end = None
 
     def is_word(self):
-        pass
+        return str(self) == DICT[self.word_pointer_start]
 
     def is_prefix(self):
         pass
 
-    def __repr__(self):
+    def __str__(self):
         ''.join([self.field[i][j] for i, j in self.coord_list])
-
 
 
 class puzzle():
