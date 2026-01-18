@@ -20,6 +20,13 @@ class path():
     def is_prefix(self):
         pass
 
+    def next(self):
+        next_paths = []
+        last_coord = self.coord_list[-1]
+        for i, j in zip([-1,1]):
+            # TODO
+            pass
+
     def __str__(self):
         ''.join([self.field[i][j] for i, j in self.coord_list])
 
@@ -34,11 +41,13 @@ class puzzle():
         done = False
         while not done:
             paths = [[coords]]
+            next_paths = []
             for path in paths:
                 if path.is_word():
-                    words.append(path.string())
-                if not path.is_prefix():
-                    pass
+                    words.append(path)
+
+                if path.is_prefix():
+                    next_paths += path.next()
 
 
 for i in range(len(puzzle)):
