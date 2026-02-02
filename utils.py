@@ -84,4 +84,27 @@ class Path():
     def __str__(self) -> str:
         return ''.join([self.field[i][j] for i, j in self.coord_list])
 
+class Puzzle():
+    def __init__(self, field, dictionary):
+        self.field = field
+        self.dictionary = dictionary
+        self.trie = Trie()
+        self.trie.add_dict(dictionary)
+
+    def find_words_from(self, coords, min_len = 4):
+        words = []
+        done = False
+        paths = [Path([coords], self.field, self.trie)]
+        while not done:
+            next_paths = []
+            for path in paths:
+                if path.is_word() and len(path.coord_list) >= min_len:
+                    words.append(path)
+                next_paths += path.next_paths()
+            paths = next_paths
+            if len(paths) == 0:
+                done = True
+        return words
+    
+
 

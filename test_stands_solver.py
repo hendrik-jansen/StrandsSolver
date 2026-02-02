@@ -1,4 +1,4 @@
-from utils import Trie, Path
+from utils import Trie, Path, Puzzle
 
 def test_trie():
     """Test the Trie Data-Structure""" 
@@ -26,3 +26,16 @@ def test_path():
     path2 = Path([[2, 1]], field, trie)
     assert(len(path1.next_paths()) == 1)
     assert(len(path2.next_paths()) == 2)
+
+def test_puzzle():
+    field = [
+        ['h', 'o', 'l', 'l', 'o'],
+        ['o', 'e', 'i', 'n', 'f'],
+        ['f', 'i', 'i', 'h', 'u'],
+        ['g', 'l', 'o', 'e', 's']
+    ]
+    dictionary = ['hello']
+    puzzle = Puzzle(field, dictionary)
+    words = puzzle.find_words_from([0, 0])
+    assert([str(word) for  word in words] == ['hello'])
+

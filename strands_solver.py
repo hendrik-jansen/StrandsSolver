@@ -1,35 +1,28 @@
 from utils import *
 
 
-class puzzle():
-    def __init__(self, field, dictionary):
-        self.field = field
-        self.dictionary = dictionary
-
-    def find_words_from(self, coords):
-        words = []
-        done = False
-        next_paths = [Path([coords], self.field, self.dictionary)]
-        while not done:
-            for path in next_paths:
-                if path.is_word():
-                    words.append(path)
-                next_paths += path.next_paths()
-            if len(next_paths) == 0:
-                done = True
-
 DICT = []
 
-with open('words.txt', 'r') as file:
+with open('english3.txt', 'r') as file:
     for line in file:
         DICT.append(line[:-2].lower())
 
-# print(DICT)
+field = [
+            ['t','s','a','h','a','s'],
+            ['e','k','t','r','b','h'],
+            ['r','s','i','a','g','t'],
+            ['i','l','d','c','a','l'],
+            ['s','e','t','k','o','r'],
+            ['d','y','e','b','o','e'],
+            ['n','e','m','c','e','a'],
+            ['u','r','s','t','r','c']
+         ]
+puzzle = Puzzle(field, DICT)
 
-WordTrie = Trie()
-
-WordTrie.add_dict(DICT)
-
-for i in range(len(puzzle)):
-    for j in range(len(puzzle[i])):
-        print(puzzle[i][j])
+words = []
+for i in range(len(field)):
+    for j in range(len(field[0])):
+        new_words = puzzle.find_words_from([i, j])
+        print([str(word) for word in new_words])
+        print(f"Found {len(new_words)} new words from position {i}, {j}")
+        words.append(new_words)
