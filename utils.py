@@ -1,4 +1,5 @@
-from typing import Optional
+from __future__ import annotations
+from typing import Optional, Union, List
 from dataclasses import dataclass
 
 
@@ -57,6 +58,10 @@ class Path:
         self.current_node = current_node
         if self.current_node == None:
             self.update_current_node()
+
+    @property
+    def lenght(self):
+        return len(self.coord_list)
 
     def update_current_node(self):
         prefix = str(self)
@@ -126,13 +131,57 @@ class Puzzle:
         return words
 
 
-# @dataclass
-# class One:
-#    L: One
-#    R: One
-#    U: One
-#    D: One
-#    C: One
+@dataclass
+class Element:
+    left: Optional[Element] = None
+    right: Optional[Element] = None
+    up: Optional[Union[Element, Column]] = None
+    down: Optional[Union[Element, Column]] = None
+    header: Optional[Column] = None
+
+
+@dataclass
+class Column:
+    left: Optional[Column] = None
+    right: Optional[Column] = None
+    up: Optional[Union[Element, Column]] = None
+    down: Optional[Union[Element, Column]] = None
+    header: Optional[Column] = None
+    size: Optional[int] = None
+    word: Optional[Path] = None
+
+
+# def insert_word(header: Column, word: Path):
+#     new_column = Column(size=word.lenght, word=word)
+
+
+def construct_matrix(word_list: List[Path], width, height):
+    first_row_element = [None] * (width * height)
+    root = Column()
+    root.left = root
+    root.right = root
+    for word in word_list:
+        new_column = Column(size=word.lenght, word=word)
+        new_column.right = root
+        new_column.left = root.left
+        root.left.right = new_column
+        root.left = new_column
+        new_column.down = new_column
+        new_column.up = new_column
+        element_rows = sorted([coord[0] * coord[1] for coord in word.coord_list])
+        for row in element_rows:
+            new_element = Element(header=new_column)
+            new_element.down = new_column
+            new_element.up = new_column.up
+            new_column.up.down = new_element
+            new_column.up = new_element
+            if first_row_element[row] == None:
+                first_row_element[row] = new_element
+            new_element.right = first_row_element[row]
+            new_element.left = first_row_element[row].left
+            first_row_element[row].left.right = new_element
+            first_row_element[row].left = new_element
+    return root
 
 
 def find_word_cover(word_list, width, height):
