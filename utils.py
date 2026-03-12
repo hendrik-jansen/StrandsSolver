@@ -60,7 +60,7 @@ class Path:
             self.update_current_node()
 
     @property
-    def lenght(self):
+    def length(self):
         return len(self.coord_list)
 
     def update_current_node(self):
@@ -72,6 +72,9 @@ class Path:
             except:
                 raise ValueError("Path is not a prefix in Trie")
         self.current_node = current_node
+
+    def is_prefix(self):
+        return self.trie.is_prefix(str(self))
 
     def is_word(self):
         return self.current_node.end
@@ -115,7 +118,9 @@ class Puzzle:
         self.trie = Trie()
         self.trie.add_dict(dictionary)
 
-    def find_words_from(self, coords, min_len=4):
+    def find_words_from(self, coords, min_len=0):
+        if not self.trie.is_prefix(self.field[coords[0]][coords[1]]):
+            return []
         words = []
         done = False
         paths = [Path([coords], self.field, self.trie)]
@@ -161,7 +166,7 @@ def construct_matrix(word_list: List[Path], width, height):
     root.left = root
     root.right = root
     for word in word_list:
-        new_column = Column(size=word.lenght, word=word)
+        new_column = Column(size=word.length, word=word)
         new_column.right = root
         new_column.left = root.left
         root.left.right = new_column
@@ -177,6 +182,8 @@ def construct_matrix(word_list: List[Path], width, height):
             new_column.up = new_element
             if first_row_element[row] == None:
                 first_row_element[row] = new_element
+                first_row_element[row].right = first_row_element[row]
+                first_row_element[row].left = first_row_element[row]
             new_element.right = first_row_element[row]
             new_element.left = first_row_element[row].left
             first_row_element[row].left.right = new_element
