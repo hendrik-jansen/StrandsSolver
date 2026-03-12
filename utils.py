@@ -1,16 +1,21 @@
-class TrieNode():
-    def __init__(self, children = None, end = False):
+from typing import Optional
+from dataclasses import dataclass
+
+
+class TrieNode:
+    def __init__(self, children=None, end=False):
         self.children = children
         if self.children == None:
             self.children = {}
         self.end = end
 
-class Trie():
-    def __init__(self, root = None):
+
+class Trie:
+    def __init__(self, root: Optional[TrieNode] = None):
         self.root = root
         if self.root == None:
-            self.root = TrieNode() 
-    
+            self.root = TrieNode()
+
     def add_word(self, word):
         current_node = self.root
         for c in word:
@@ -31,7 +36,7 @@ class Trie():
             else:
                 return False
         return True
-    
+
     def is_word(self, word):
         current_node = self.root
         for c in word:
@@ -41,15 +46,18 @@ class Trie():
                 return False
         return current_node.end == True
 
-class Path():
-    def __init__(self, coord_list, field, trie, current_node = None):
+
+class Path:
+    def __init__(
+        self, coord_list, field, trie, current_node: Optional[TrieNode] = None
+    ):
         self.coord_list = coord_list
         self.field = field
         self.trie = trie
         self.current_node = current_node
         if self.current_node == None:
             self.update_current_node()
-        
+
     def update_current_node(self):
         prefix = str(self)
         current_node = self.trie.root
@@ -57,7 +65,7 @@ class Path():
             try:
                 current_node = current_node.children[c]
             except:
-                raise ValueError('Path is not a prefix in Trie')
+                raise ValueError("Path is not a prefix in Trie")
         self.current_node = current_node
 
     def is_word(self):
@@ -71,27 +79,38 @@ class Path():
                 if i == 0 and j == 0:
                     continue
                 new_coord = [last_coord[0] + i, last_coord[1] + j]
-                if (new_coord[0] < 0 or new_coord[1] < 0 or new_coord[0] >= len(self.field)
-                    or new_coord[1] >= len(self.field[0]) or new_coord in self.coord_list):
+                if (
+                    new_coord[0] < 0
+                    or new_coord[1] < 0
+                    or new_coord[0] >= len(self.field)
+                    or new_coord[1] >= len(self.field[0])
+                    or new_coord in self.coord_list
+                ):
                     continue
                 new_char = self.field[new_coord[0]][new_coord[1]]
                 if new_char not in self.current_node.children:
                     continue
-                next_path = Path(self.coord_list + [new_coord], self.field, self.trie, self.current_node.children[new_char])
+                next_path = Path(
+                    self.coord_list + [new_coord],
+                    self.field,
+                    self.trie,
+                    self.current_node.children[new_char],
+                )
                 next_paths.append(next_path)
         return next_paths
 
     def __str__(self) -> str:
-        return ''.join([self.field[i][j] for i, j in self.coord_list])
+        return "".join([self.field[i][j] for i, j in self.coord_list])
 
-class Puzzle():
+
+class Puzzle:
     def __init__(self, field, dictionary):
         self.field = field
         self.dictionary = dictionary
         self.trie = Trie()
         self.trie.add_dict(dictionary)
 
-    def find_words_from(self, coords, min_len = 4):
+    def find_words_from(self, coords, min_len=4):
         words = []
         done = False
         paths = [Path([coords], self.field, self.trie)]
@@ -105,6 +124,16 @@ class Puzzle():
             if len(paths) == 0:
                 done = True
         return words
-    
 
 
+# @dataclass
+# class One:
+#    L: One
+#    R: One
+#    U: One
+#    D: One
+#    C: One
+
+
+def find_word_cover(word_list, width, height):
+    pass
