@@ -54,4 +54,7 @@ def test_construct_matrix():
         for j in range(2):
             words += puzzle.find_words_from([i, j])
     assert len(words) == 4
-    construct_matrix(words, 2, 2)
+    h = construct_matrix(words, 2, 2)
+    for i in range(4):
+        h = h.right
+        assert h.size == 2

@@ -140,20 +140,36 @@ class Puzzle:
 class Element:
     left: Optional[Element] = None
     right: Optional[Element] = None
-    up: Optional[Union[Element, Column]] = None
-    down: Optional[Union[Element, Column]] = None
+    up: Optional[Element] = None
+    down: Optional[Element] = None
     header: Optional[Column] = None
 
 
 @dataclass
-class Column:
-    left: Optional[Column] = None
-    right: Optional[Column] = None
-    up: Optional[Union[Element, Column]] = None
-    down: Optional[Union[Element, Column]] = None
-    header: Optional[Column] = None
+class Column(Element):
     size: Optional[int] = None
-    word: Optional[Path] = None
+    index: Optional[int] = None
+
+
+def insert_left(e1: Element, e2: Element):
+    e2.left = e1.left
+    e2.right = e1
+    e1.left.right = e2
+    e1.left = e2
+
+
+def insert_right(e1: Element, e2: Element):
+    e2.right = e1.right
+    e2.left = e1
+    e1.right.left = e2
+    e1.right = e2
+
+
+def insert_up(e1: Element, e2: Element):
+    e2.up = e1.up
+    e2.down = e1
+    e1.up.down = e2
+    e1.up = e2
 
 
 # def insert_word(header: Column, word: Path):
@@ -161,35 +177,62 @@ class Column:
 
 
 def construct_matrix(word_list: List[Path], width, height):
-    first_row_element = [None] * (width * height)
-    root = Column()
-    root.left = root
-    root.right = root
+    h = Column()
+    h.left = h
+    h.right = h
+    columns = []
+    for i in range(width * height):
+        c = Column(size=0, index=i)
+        c.header = c
+        c.up = c
+        c.down = c
+        columns.append(c)
+        insert_left(h, c)
     for word in word_list:
-        new_column = Column(size=word.length, word=word)
-        new_column.right = root
-        new_column.left = root.left
-        root.left.right = new_column
-        root.left = new_column
-        new_column.down = new_column
-        new_column.up = new_column
-        element_rows = sorted([coord[0] * coord[1] for coord in word.coord_list])
-        for row in element_rows:
-            new_element = Element(header=new_column)
-            new_element.down = new_column
-            new_element.up = new_column.up
-            new_column.up.down = new_element
-            new_column.up = new_element
-            if first_row_element[row] == None:
-                first_row_element[row] = new_element
-                first_row_element[row].right = first_row_element[row]
-                first_row_element[row].left = first_row_element[row]
-            new_element.right = first_row_element[row]
-            new_element.left = first_row_element[row].left
-            first_row_element[row].left.right = new_element
-            first_row_element[row].left = new_element
-    return root
+        indices = sorted([coord[0] * width + coord[1] for coord in word.coord_list])
+        first_e = None
+        for i in indices:
+            e = Element(header=columns[i])
+            columns[i].size += 1
+            if first_e == None:
+                e.right = e
+                e.left = e
+                first_e = e
+            insert_up(columns[i], e)
+            insert_left(first_e, e)
+    return h
+
+
+# def construct_matrix(word_list: List[Path], width, height):
+#     first_row_element = [None] * (width * height)
+#     root = Column()
+#     root.left = root
+#     root.right = root
+#     for word in word_list:
+#         new_column = Column(size=word.length, word=word)
+#         new_column.right = root
+#         new_column.left = root.left
+#         root.left.right = new_column
+#         root.left = new_column
+#         new_column.down = new_column
+#         new_column.up = new_column
+#         element_rows = sorted([coord[0] * coord[1] for coord in word.coord_list])
+#         for row in element_rows:
+#             new_element = Element(header=new_column)
+#             new_element.down = new_column
+#             new_element.up = new_column.up
+#             new_column.up.down = new_element
+#             new_column.up = new_element
+#             if first_row_element[row] == None:
+#                 first_row_element[row] = new_element
+#                 first_row_element[row].right = first_row_element[row]
+#                 first_row_element[row].left = first_row_element[row]
+#             new_element.right = first_row_element[row]
+#             new_element.left = first_row_element[row].left
+#             first_row_element[row].left.right = new_element
+#             first_row_element[row].left = new_element
+#     return root
 
 
 def find_word_cover(word_list, width, height):
-    pass
+    matrix = construct_matrix(word_list, width, height)
