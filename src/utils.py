@@ -225,12 +225,26 @@ def cover_column(c):
             j = j.right
         i = i.right
 
-def search(matrix_root: Column):
+def uncover_column(c):
+    pass
+
+def search(matrix_root, partial_solution):
     if matrix_root.right == matrix_root:
-        return
+        return partial_solution
     c = choose_column(matrix_root)
     cover_column(c)
-    
+    r = c.down
+    while r != c:
+        j = r.right
+        while j != r:
+            cover_column(j.head)
+            j = j.right
+        search(matrix_root, partial_solution)
+        j = r.left
+        while j != r:
+            uncover_column(j.head)
+            j = j.left
+        r = r.down
 
 
 def find_word_cover(word_list, width, height):
