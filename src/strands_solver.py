@@ -25,9 +25,13 @@ puzzle = Puzzle(field, DICT)
 words = []
 for i in range(len(field)):
     for j in range(len(field[i])):
-        new_words = puzzle.find_words_from([i, j], min_len=0)
+        new_words = puzzle.find_words_from([i, j], min_len=4)
         print([str(word) for word in new_words])
         print(f"Found {len(new_words)} new words from position {i}, {j}")
         words += new_words
 
 print(words)
+print("searching word covers")
+covers = []
+covers = find_word_cover(words, 6, 8)
+print("done!")

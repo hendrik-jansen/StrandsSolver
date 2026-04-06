@@ -172,10 +172,6 @@ def insert_up(e1: Element, e2: Element):
     e1.up = e2
 
 
-# def insert_word(header: Column, word: Path):
-#     new_column = Column(size=word.lenght, word=word)
-
-
 def construct_matrix(word_list: List[Path], width, height):
     h = Column()
     h.left = h
@@ -202,51 +198,72 @@ def construct_matrix(word_list: List[Path], width, height):
             insert_left(first_e, e)
     return h
 
+
 def choose_column(matrix_root):
     c_iter = matrix_root.right
     s = None
     c = None
-    while c_iter != matrix_root:
+    while c_iter is not matrix_root:
         if s == None or c_iter.size > s:
             s = c_iter.size
             c = c_iter
         c_iter = c_iter.right
     return c
 
+
 def cover_column(c):
     c.left.right = c.right
     c.right.left = c.left
     i = c.down
-    while i != c:
+    while i is not c:
         j = i.right
-        while j != i:
+        while j is not i:
             j.up.down = j.down
             j.down.up = j.up
+            j.header.size -= 1
             j = j.right
-        i = i.right
+        i = i.down
+
 
 def uncover_column(c):
-    pass
+    c.left.right = c
+    c.right.left = c
+    i = c.up
+    while i is not c:
+        j = i.left
+        while j is not i:
+            j.up.down = j
+            j.down.up = j
+            j.header.size += 1
+            j = j.left
+        i = i.up
 
-def search(matrix_root, partial_solution):
-    if matrix_root.right == matrix_root:
-        return partial_solution
+
+def search(matrix_root, partial_solution, solutions):
+    if matrix_root.right is matrix_root:
+        solutions.append(partial_solution.copy())
+        return
     c = choose_column(matrix_root)
     cover_column(c)
     r = c.down
-    while r != c:
+    while r is not c:
         j = r.right
-        while j != r:
-            cover_column(j.head)
+        while j is not r:
+            cover_column(j.header)
             j = j.right
-        search(matrix_root, partial_solution)
+        partial_solution.append(r)
+        search(matrix_root, partial_solution, solutions)
+        partial_solution.pop()
         j = r.left
-        while j != r:
-            uncover_column(j.head)
+        while j is not r:
+            uncover_column(j.header)
             j = j.left
         r = r.down
+    uncover_column(c)
 
 
 def find_word_cover(word_list, width, height):
     matrix = construct_matrix(word_list, width, height)
-    
+    solutions = []
+    search(matrix, [], solutions)
+    return solutions

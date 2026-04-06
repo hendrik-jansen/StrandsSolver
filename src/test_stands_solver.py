@@ -1,4 +1,4 @@
-from utils import Trie, Path, Puzzle, Element, Column, construct_matrix
+from utils import Trie, Path, Puzzle, Element, Column, construct_matrix, find_word_cover
 
 
 def test_trie():
@@ -58,3 +58,17 @@ def test_construct_matrix():
     for i in range(4):
         h = h.right
         assert h.size == 2
+
+
+def test_find_word_cover():
+    field = [["n", "i"], ["i", "n"]]
+    dictionary = ["in"]
+    puzzle = Puzzle(field, dictionary)
+    words = []
+    for i in range(2):
+        for j in range(2):
+            words += puzzle.find_words_from([i, j])
+    assert len(words) == 4
+    covers = find_word_cover(words, 2, 2)
+    print(covers)
+    assert len(covers) == 2
